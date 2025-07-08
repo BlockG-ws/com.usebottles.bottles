@@ -34,7 +34,7 @@ jobs:
           platforms: arm64
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
-          bundle: com.qq.QQ.flatpak
-          manifest-path: com.qq.QQ.yaml
+          bundle: com.usebottles.bottles.flatpak
+          manifest-path: com.usebottles.bottles.yml
           arch: ${{ matrix.arch }}
-          branch: liteloader
+          branch: ntlm
