@@ -8,33 +8,28 @@ on:
       - ntlm
   workflow_dispatch:
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  build:
     container:
       # https://github.com/flatpak/flatpak-github-actions?tab=readme-ov-file#docker-image
-      image: bilelmoussaoui/flatpak-github-actions:freedesktop-23.08
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
       options: --privileged
     permissions:
       contents: read
     strategy:
       matrix:
-        arch:
-          - x86_64
-          - aarch64
+        variant:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.variant.runner }}
     steps:
       - uses: actions/checkout@v4
-      - name: Install deps
-        if: ${{ matrix.arch == 'aarch64' }}
-        run: dnf -y install docker
-      - name: Setup QEMU
-        if: ${{ matrix.arch == 'aarch64' }}
-        id: qemu
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: arm64
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: com.usebottles.bottles.flatpak
           manifest-path: com.usebottles.bottles.yml
-          arch: ${{ matrix.arch }}
+          arch: ${{ matrix.variant.arch }}
           branch: ntlm
+          cache-key: flatpak-builder-${{ github.sha }}
+          verbose: true
